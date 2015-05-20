@@ -12,20 +12,36 @@ var ANIM_WALK_RIGHT = 7;
 var ANIM_SHOOT_RIGHT = 8;
 var ANIM_MAX = 9;
 
-var Player = function() {
-	this.sprite = new Sprite("ChuckNorris.png");
-	this.sprite.buildAnimation(12, 8, 165, 126, 0.05,
-		[0, 1, 2, 3, 4, 5, 6, 7]);
-	this.sprite.buildAnimation(12, 8, 165, 126, 0.05,
-		[8, 9, 10, 11, 12]);
-	this.sprite.buildAnimation(12, 8, 165, 126, 0.05,
-		[13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26]);
-	this.sprite.buildAnimation(12, 8, 165, 126, 0.05,
-		[52, 53, 54, 55, 56, 57, 58, 59]);
-	this.sprite.buildAnimation(12, 8, 165, 126, 0.05,
-		[60, 61, 62, 63, 64]);
-	this.sprite.buildAnimation(12, 8, 165, 126, 0.05,
-		[65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78]);
+var Player = function()
+        {
+                this.sprite = new Sprite("ChuckNorris.png");                                   
+ 
+                this.sprite.buildAnimation(12, 8, 165, 126, 0.05,               //idle left
+                        [0, 1, 2, 3, 4, 5, 6, 7]);
+ 
+                this.sprite.buildAnimation(12, 8, 165, 126, 0.05,               //jump left
+                        [8, 9, 10, 11, 12]);
+ 
+                this.sprite.buildAnimation(12, 8, 165, 126, 0.05,               //walk left
+                        [13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26]);
+ 
+                this.sprite.buildAnimation(12, 8, 165, 126, 0.05,               //shoot left
+            [27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40]);
+ 
+        this.sprite.buildAnimation(12, 8, 165, 126, 0.05,               //climb
+            [41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51]);
+ 
+                this.sprite.buildAnimation(12, 8, 165, 126, 0.05,               //idle right
+                        [52, 53, 54, 55, 56, 57, 58, 59]);
+ 
+                this.sprite.buildAnimation(12, 8, 165, 126, 0.05,               //jump right
+                        [60, 61, 62, 63, 64]);
+ 
+                this.sprite.buildAnimation(12, 8, 165, 126, 0.05,               //walk right
+                        [65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78]);
+ 
+        this.sprite.buildAnimation(12, 8, 165, 126, 0.05,               //shoot right
+            [79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92]);
 	
 	for(var i=0; i<ANIM_MAX; i++)
 	{
@@ -46,7 +62,6 @@ var Player = function() {
 	this.direction = LEFT;
 };
 
-
 Player.prototype.update = function(deltaTime)
 {
 	this.sprite.update(deltaTime);
@@ -58,9 +73,17 @@ Player.prototype.update = function(deltaTime)
 	// check keypress events
 	if(keyboard.isKeyDown(keyboard.KEY_LEFT) == true) {
 		left = true;
+		this.direction = LEFT;
+		if(this.sprite.currentAnimation != ANIM_WALK_LEFT &&
+			this.jumping == false)
+			this.sprite.setAnimation(ANIM_WALK_LEFT);
 	}
 	if(keyboard.isKeyDown(keyboard.KEY_RIGHT) == true) {
 		right = true;
+		this.direction = RIGHT;
+		if(this.sprite.currentAnimation != ANIM_WALK_RIGHT &&
+			this.jumping == false)
+			this.sprite.setAnimation(ANIM_WALK_RIGHT);
 	}
 	if(keyboard.isKeyDown(keyboard.KEY_SPACE) == true) {
 		jump = true;
@@ -86,6 +109,16 @@ Player.prototype.update = function(deltaTime)
 	{
 		ddy = ddy - JUMP; // apply an instantaneous (large) vertical impulse
 		this.jumping = true;
+		if (jump && !this.jumping && !falling)
+		{
+			// apply an instantaneous (large) vertical impulse
+			ddy = ddy - JUMP;
+			 this.jumping = true;
+			if(this.direction == LEFT)
+				this.sprite.setAnimation(ANIM_JUMP_LEFT)
+			else
+				this.sprite.setAnimation(ANIM_JUMP_RIGHT)
+		}
 	}
 	
 	// calculate the new position and velocity:
