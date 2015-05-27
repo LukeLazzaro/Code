@@ -113,7 +113,7 @@ Player.prototype.update = function(deltaTime)
 		{
 			// apply an instantaneous (large) vertical impulse
 			ddy = ddy - JUMP;
-			 this.jumping = true;
+			this.jumping = true;
 			if(this.direction == LEFT)
 				this.sprite.setAnimation(ANIM_JUMP_LEFT)
 			else
@@ -132,6 +132,15 @@ Player.prototype.update = function(deltaTime)
 	{
 		// clamp at zero to prevent friction from making us jiggle side to side
 		this.velocity.x = 0;
+		
+		if(wasleft == true)
+		{
+			this.sprite.setAnimation(ANIM_IDLE_LEFT)
+		}
+		else
+		{
+			this.sprite.setAnimation(ANIM_IDLE_RIGHT)
+		}
 	}
 	
 	// collision detection
@@ -193,5 +202,6 @@ Player.prototype.update = function(deltaTime)
 
 Player.prototype.draw = function()
 {
-	this.sprite.draw(context, this.position.x, this.position.y);
+	context.drawImage(this.image,
+					this.position.x - worldOffsetX, this.position.y);
 }
