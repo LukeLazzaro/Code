@@ -40,6 +40,10 @@ var fps = 0;
 var fpsCount = 0;
 var fpsTime = 0;
 
+// self explanatory
+var musicBackground;
+var sfxFire;
+
 // create the score variable
 var score = 0;
 
@@ -75,6 +79,20 @@ var LAYER_COUNT = 3;
 var LAYER_BACKGOUND = 0;
 var LAYER_PLATFORMS = 1;
 var LAYER_LADDERS = 2;
+
+// enemy.js constants
+var ENEMY_MAXDX = METER * 5;
+var ENEMY_ACCEL = ENEMY_MAXDX * 2;
+
+var enemies = [];
+
+var LAYER_COUNT = 3;
+var LAYER_BACKGOUND = 0;
+var LAYER_PLATFORMS = 1;
+var LAYER_LADDERS = 2;
+
+var LAYER_OBJECT_ENEMIES = 3;
+var LAYER_OBJECT_TRIGGERS = 4;
 
  // abitrary choice for 1m
 var METER = TILE;
@@ -177,6 +195,25 @@ function drawMap()
 
 var cells = []; // the array that holds our simplified collision data
 function initialize() {
+	musicBackground = new Howl(
+	{
+		urls: ["background.ogg"],
+		loop: true,
+		buffer: true,
+		volume: 0.1
+	} );
+	musicBackground.play();
+	sfxFire = new Howl(
+	{
+		urls: ["fireEffect.ogg"],
+		buffer: true,
+		volume: 1,
+		onend: function() {
+		isSfxPlaying = false;
+	}
+	} );
+
+	
 	for(var layerIdx = 0; layerIdx < LAYER_COUNT; layerIdx++) { // initialize the collision map
 		cells[layerIdx] = [];
 		var idx = 0;
@@ -200,6 +237,20 @@ function initialize() {
 			}
 		}
 	}
+	
+	// add enemies
+	idx = 0;
+	for(var y = 0; y < level1.layers[LAYER_OBJECT_ENEMIES].height; y++) {
+		for(var x = 0; x < level1.layers[LAYER_OBJECT_ENEMIES].width; x++) {
+			if(level1.layers[LAYER_OBJECT_ENEMIES].data[idx] != 0) {
+				var px = tileToPixel(x);
+				var py = tileToPixel(y);
+				var e = new Enemy(px, py);
+				enemies.push(e);
+			}
+			idx++;
+		}
+	}
 }
 
 function run()
@@ -209,9 +260,9 @@ function run()
 	
 	var deltaTime = getDeltaTime();
 	
-	drawMap();
+	player.update(deltaTime); // update the player before drawing the map
 	
-	player.update(deltaTime);
+	drawMap();
 	player.draw();
 	
 	// update the frame counter
@@ -239,6 +290,11 @@ function run()
 	for(var i=0; i<lives; i++)
 	{
 		context.drawImage(heartImage, 20 + ((heartImage.width+2)*i), 10);
+	}
+	
+	for(var i=0; i<enemies.length; i++)
+	{
+		enemies[i].update(deltaTime);
 	}
 }
 
